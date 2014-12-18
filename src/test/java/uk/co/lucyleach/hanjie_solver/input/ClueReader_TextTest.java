@@ -5,8 +5,9 @@ import com.google.common.collect.Lists;
 import org.junit.Test;
 import uk.co.lucyleach.hanjie_solver.Clues;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +16,13 @@ import static org.junit.Assert.assertNotNull;
 
 public class ClueReader_TextTest
 {
-  private static ClueReader<File> UNDER_TEST = new ClueReader_Text();
+  private static ClueReader<Path> UNDER_TEST = new ClueReader_Text();
 
   @Test
-  public void testCorrectFile()
+  public void testCorrectFile() throws URISyntaxException
   {
-    Clues clues = UNDER_TEST.readInput(new File(this.getClass().getResource("test_input.txt").getFile()));
-    assertNotNull(clues);
+    Clues clues = UNDER_TEST.readInput(Paths.get(this.getClass().getResource("test_input.txt").toURI()));
+    assertNotNull("Shouldn't get a null return value", clues);
 
     Map<Integer, List<Integer>> columnClues = clues.getColumnClues();
     Map<Integer, List<Integer>> expectedColumnClues = ImmutableMap.<Integer, List<Integer>>builder()
@@ -56,10 +57,10 @@ public class ClueReader_TextTest
     assertEquals("Row clues should match", expectedRowClues, rowClues);
   }
 
-  @Test(expected = FileNotFoundException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testMissingFile()
   {
-    UNDER_TEST.readInput(new File(""));
+    UNDER_TEST.readInput(Paths.get(""));
   }
 
   @Test(expected = NullPointerException.class)
@@ -69,8 +70,20 @@ public class ClueReader_TextTest
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testNonNumericFile()
+  public void testEmptyFile() throws URISyntaxException
   {
-    UNDER_TEST.readInput(new File(this.getClass().getResource("non_numeric_test_input.txt").getFile()));
+    UNDER_TEST.readInput(Paths.get(this.getClass().getResource("empty_file.txt").toURI()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testSingleLineFile() throws URISyntaxException
+  {
+    UNDER_TEST.readInput(Paths.get(this.getClass().getResource("single_line_file.txt").toURI()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNonNumericFile() throws URISyntaxException
+  {
+    UNDER_TEST.readInput(Paths.get(this.getClass().getResource("non_numeric_test_input.txt").toURI()));
   }
 }

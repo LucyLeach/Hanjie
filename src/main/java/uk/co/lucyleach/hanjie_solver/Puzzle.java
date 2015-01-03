@@ -11,5 +11,6 @@ public interface Puzzle
 {
   Clues getClues();
 
+  //First key is row number
   Table<Integer, Integer, SquareState> getStates();
 }

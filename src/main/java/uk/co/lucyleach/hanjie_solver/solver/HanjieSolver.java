@@ -22,6 +22,7 @@ public class HanjieSolver
   }
 
   //TODO add tests - include all puzzles from strategy tests and one that it can't solve
+  //TODO - just looping won't work, strategies have to be re-applied after other strategies have run
   public Puzzle solve(Clues clues) throws UnsolvableException
   {
     Puzzle runningPuzzle = new PuzzleImpl(clues);

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-//TODO write tests
 public class FullyKnownStrategyTest
 {
   private static final Strategy UNDER_TEST = new FullyKnownStrategy();

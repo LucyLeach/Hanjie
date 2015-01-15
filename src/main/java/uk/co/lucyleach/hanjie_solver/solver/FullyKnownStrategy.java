@@ -40,12 +40,12 @@ public class FullyKnownStrategy implements Strategy
       int currentSize = row.size();
       for(int i = currentSize; i < currentSize + clue; i++)
       {
-        row.put(i, SquareState.FULL);
+        row.put(i + 1, SquareState.FULL);
       }
-      row.put(row.size(), SquareState.BLANK);
+      row.put(row.size() + 1, SquareState.BLANK);
     }
 
-    row.remove(row.size() - 1);
+    row.remove(row.size());
     return row;
   }
 }

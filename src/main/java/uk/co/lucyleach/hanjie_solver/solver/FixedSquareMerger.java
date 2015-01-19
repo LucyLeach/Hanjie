@@ -14,6 +14,7 @@ class FixedSquareMerger
   OperationResult merge(int squarePosition, SquareState squareState, PossibleSolutions toMergeInto)
     throws UnsolvableException
   {
-
+    //TODO
+    throw new UnsupportedOperationException();
   }
 }

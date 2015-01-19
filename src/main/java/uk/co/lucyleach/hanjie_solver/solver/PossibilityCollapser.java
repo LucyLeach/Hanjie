@@ -12,6 +12,7 @@ class PossibilityCollapser
 {
   OperationResult collapse(PossibleSolutions possibleSolutions)
   {
-
+    //TODO
+    throw new UnsupportedOperationException();
   }
 }

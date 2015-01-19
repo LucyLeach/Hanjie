@@ -13,6 +13,7 @@ class InitialSolutionsCreator
 {
   PossibleSolutions create(List<Integer> clues, int length)
   {
-
+    //TODO
+    throw new UnsupportedOperationException();
   }
 }

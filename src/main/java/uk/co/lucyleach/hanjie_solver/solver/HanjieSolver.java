@@ -37,10 +37,11 @@ public class HanjieSolver
       completelySolved = checkIfSolved(rowSolutions);
     }
 
+    Puzzle puzzle = solutionFromPossibilities(rowSolutions);
     if(!completelySolved)
-      throw new UnsolvableException();
+      throw new UnsolvableException("Cannot solve puzzle from the clues given", puzzle);
     else
-      return solutionFromPossibilities(rowSolutions);
+      return puzzle;
   }
 
   private Map<Integer, PossibleSolutions> createInitialSolutions(Map<Integer, List<Integer>> clues, final int length)
@@ -102,9 +103,10 @@ public class HanjieSolver
     return allSolved;
   }
 
-  //Don't need column solutions, duplicate information
+  //Don't need column solutions, duplicate information. NB may not have a fully solved set of solutions.
   private static Puzzle solutionFromPossibilities(Map<Integer, PossibleSolutions> rowSolutions)
   {
-
+    //TODO
+    throw new UnsupportedOperationException();
   }
 }

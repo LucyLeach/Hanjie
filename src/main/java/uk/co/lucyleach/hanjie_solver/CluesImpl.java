@@ -34,6 +34,18 @@ public class CluesImpl implements Clues
     return columnClues;
   }
 
+  @Override
+  public int getRowLength()
+  {
+    return columnClues.size();
+  }
+
+  @Override
+  public int getColumnLength()
+  {
+    return rowClues.size();
+  }
+
   private static Map<Integer, List<Integer>> makeImmutable(Map<Integer, List<Integer>> inputMap)
   {
     ImmutableMap.Builder<Integer, List<Integer>> bob = ImmutableMap.builder();

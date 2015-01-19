@@ -15,4 +15,8 @@ public interface Clues
 
   //Corresponds to clues read along the top of the puzzle
   Map<Integer, List<Integer>> getColumnClues();
+
+  int getRowLength();
+
+  int getColumnLength();
 }

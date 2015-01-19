@@ -2,9 +2,6 @@ package uk.co.lucyleach.hanjie_solver;
 
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
-import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
-
-import java.util.Map;
 
 /**
  * User: Lucy
@@ -48,60 +45,5 @@ public class PuzzleImpl implements Puzzle
   {
     //TODO check if Table is mutable
     return states;
-  }
-
-  @Override
-  public boolean isFullySolved()
-  {
-    boolean hasUnknownSquare = false;
-    for(SquareState state: states.values())
-    {
-      if(SquareState.UNKNOWN.equals(state))
-        hasUnknownSquare = true;
-    }
-
-    return !hasUnknownSquare;
-  }
-
-  @Override
-  public Puzzle updateRow(int rowKey, Map<Integer, SquareState> newRowState) throws UnsolvableException
-  {
-    ImmutableTable.Builder<Integer, Integer, SquareState> bob = ImmutableTable.builder();
-    for(Table.Cell<Integer, Integer, SquareState> cell: states.cellSet())
-    {
-      if(cell.getRowKey() == rowKey && newRowState.containsKey(cell.getColumnKey()))
-      {
-        if(!SquareState.UNKNOWN.equals(cell.getValue()))
-          throw new UnsolvableException("Tried to edit value to " + newRowState.get(cell.getColumnKey()) + " but value is already " + cell.getValue(), cell.getRowKey(), cell.getColumnKey(), this);
-        else
-          bob.put(cell.getRowKey(), cell.getColumnKey(), newRowState.get(cell.getColumnKey()));
-      }
-      else
-      {
-        bob.put(cell);
-      }
-    }
-    return new PuzzleImpl(clues, bob.build());
-  }
-
-  @Override
-  public Puzzle updateColumn(int columnKey, Map<Integer, SquareState> newColumnState) throws UnsolvableException
-  {
-    ImmutableTable.Builder<Integer, Integer, SquareState> bob = ImmutableTable.builder();
-    for(Table.Cell<Integer, Integer, SquareState> cell: states.cellSet())
-    {
-      if(cell.getColumnKey() == columnKey && newColumnState.containsKey(cell.getRowKey()))
-      {
-        if(!SquareState.UNKNOWN.equals(cell.getValue()))
-          throw new UnsolvableException("Tried to edit value to " + newColumnState.get(cell.getRowKey()) + " but value is already " + cell.getValue(), cell.getRowKey(), cell.getColumnKey(), this);
-        else
-          bob.put(cell.getRowKey(), cell.getColumnKey(), newColumnState.get(cell.getRowKey()));
-      }
-      else
-      {
-        bob.put(cell);
-      }
-    }
-    return new PuzzleImpl(clues, bob.build());
   }
 }

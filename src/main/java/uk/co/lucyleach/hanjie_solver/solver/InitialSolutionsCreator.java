@@ -118,24 +118,24 @@ class InitialSolutionsCreator
         {
           int numberOfUnconstrainedBlanks = totalNumberOfBlanks - numberOfConstrainedBlanks;
           List<Integer> cluesWithoutLastEntry = new ArrayList<>(clues);
-          cluesWithoutLastEntry.remove(cluesWithoutLastEntry.size() - 1);
+          int removedClue = cluesWithoutLastEntry.remove(cluesWithoutLastEntry.size() - 1);
           Set<PuzzleSolvingAction> actions = new HashSet<>();
           for(int numberOfBlanksAtEnd = 0; numberOfBlanksAtEnd <= numberOfUnconstrainedBlanks; numberOfBlanksAtEnd++)
           {
             //Create new puzzle to solve without the blanks at the end, the last block (defined by the last clue) and the blank just before it
-            actions.add(new PuzzleSolvingAction(length - numberOfBlanksAtEnd - 2, cluesWithoutLastEntry));
+            actions.add(new PuzzleSolvingAction(length - numberOfBlanksAtEnd - 1 - removedClue, cluesWithoutLastEntry));
           }
           invokeAll(actions);
 
           solutions = new HashSet<>();
           for(PuzzleSolvingAction action: actions)
           {
-            int numberOfBlanksAtEnd = length - action.length - 2;
+            int numberOfBlanksAtEnd = length - action.length - 1 - removedClue;
             for(Map<Integer, SquareState> solution: action.getSolutions())
             {
               Map<Integer, SquareState> clonedMap = new HashMap<>(solution);
               addNumOfStatesToMap(1, SquareState.BLANK, clonedMap);
-              addNumOfStatesToMap(1, SquareState.FULL, clonedMap);
+              addNumOfStatesToMap(removedClue, SquareState.FULL, clonedMap);
               addNumOfStatesToMap(numberOfBlanksAtEnd, SquareState.BLANK, clonedMap);
               solutions.add(clonedMap);
             }

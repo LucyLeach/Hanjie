@@ -213,6 +213,42 @@ public class InitialSolutionsCreatorTest
   }
 
   @Test
+  public void testBiggerGapsClueNotEndingInOne() //Yes, this is a real gap in the test cases that came up
+  {
+    int length = 5;
+    List<Integer> clues = newArrayList(1, 2);
+    PossibleSolutions solutions = UNDER_TEST.create(clues, length);
+    assertFalse("Shouldn't have fixed all squares", solutions.allSquaresFixed());
+    assertEquals("Should have three solutions", 3, solutions.numberOfSolutions());
+
+    Set<Map<Integer, SquareState>> expectedSolutions = ImmutableSet.<Map<Integer, SquareState>>builder()
+        .add(ImmutableMap.<Integer, SquareState>builder()
+            .put(1, SquareState.FULL)
+            .put(2, SquareState.BLANK)
+            .put(3, SquareState.FULL)
+            .put(4, SquareState.FULL)
+            .put(5, SquareState.BLANK)
+            .build())
+        .add(ImmutableMap.<Integer, SquareState>builder()
+            .put(1, SquareState.FULL)
+            .put(2, SquareState.BLANK)
+            .put(3, SquareState.BLANK)
+            .put(4, SquareState.FULL)
+            .put(5, SquareState.FULL)
+            .build())
+        .add(ImmutableMap.<Integer, SquareState>builder()
+            .put(1, SquareState.BLANK)
+            .put(2, SquareState.FULL)
+            .put(3, SquareState.BLANK)
+            .put(4, SquareState.FULL)
+            .put(5, SquareState.FULL)
+            .build())
+        .build();
+
+    assertEquals(expectedSolutions, solutions.getAllSolutions());
+  }
+
+  @Test
   public void testSingleSquare()
   {
     int length = 4;

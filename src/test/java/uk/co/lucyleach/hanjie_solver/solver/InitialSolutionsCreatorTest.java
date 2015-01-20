@@ -122,7 +122,7 @@ public class InitialSolutionsCreatorTest
     List<Integer> clues = newArrayList(1, 1);
     PossibleSolutions solutions = UNDER_TEST.create(clues, length);
 
-    assertEquals("Should have seven solutions", 7, solutions.numberOfSolutions());
+    assertEquals("Should have ten solutions", 10, solutions.numberOfSolutions());
     assertFalse("Shouldn't be fully fixed", solutions.allSquaresFixed());
 
     Set<Map<Integer, SquareState>> solutionMapSet = solutions.getAllSolutions();
@@ -182,6 +182,30 @@ public class InitialSolutionsCreatorTest
                 .put(4, SquareState.FULL)
                 .put(5, SquareState.BLANK)
                 .put(6, SquareState.FULL)
+                .build())
+            .add(ImmutableMap.<Integer, SquareState>builder()
+                .put(1, SquareState.BLANK)
+                .put(2, SquareState.FULL)
+                .put(3, SquareState.BLANK)
+                .put(4, SquareState.FULL)
+                .put(5, SquareState.BLANK)
+                .put(6, SquareState.BLANK)
+                .build())
+            .add(ImmutableMap.<Integer, SquareState>builder()
+                .put(1, SquareState.BLANK)
+                .put(2, SquareState.FULL)
+                .put(3, SquareState.BLANK)
+                .put(4, SquareState.BLANK)
+                .put(5, SquareState.FULL)
+                .put(6, SquareState.BLANK)
+                .build())
+            .add(ImmutableMap.<Integer, SquareState>builder()
+                .put(1, SquareState.BLANK)
+                .put(2, SquareState.BLANK)
+                .put(3, SquareState.FULL)
+                .put(4, SquareState.BLANK)
+                .put(5, SquareState.FULL)
+                .put(6, SquareState.BLANK)
                 .build())
             .build();
 

@@ -3,6 +3,7 @@ package uk.co.lucyleach.hanjie_solver.solver;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: Lucy
@@ -11,7 +12,11 @@ import java.util.Map;
  */
 interface PossibleSolutions
 {
+  Set<Map<Integer, SquareState>> getAllSolutions();
+
   Map<Integer, SquareState> getFixedSquares();
 
   boolean allSquaresFixed();
+
+  int numberOfSolutions();
 }

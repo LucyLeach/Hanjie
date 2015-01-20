@@ -1,9 +1,11 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
 import uk.co.lucyleach.hanjie_solver.Clues;
 import uk.co.lucyleach.hanjie_solver.Puzzle;
+import uk.co.lucyleach.hanjie_solver.PuzzleImpl;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public class HanjieSolver
       completelySolved = checkIfSolved(rowSolutions);
     }
 
-    Puzzle puzzle = solutionFromPossibilities(rowSolutions);
+    Puzzle puzzle = solutionFromPossibilities(rowSolutions, clues);
     if(!completelySolved)
       throw new UnsolvableException("Cannot solve puzzle from the clues given", puzzle);
     else
@@ -87,9 +89,16 @@ public class HanjieSolver
   }
 
   //Don't need column solutions, duplicate information. NB may not have a fully solved set of solutions.
-  private static Puzzle solutionFromPossibilities(Map<Integer, PossibleSolutions> rowSolutions)
+  private static Puzzle solutionFromPossibilities(Map<Integer, PossibleSolutions> rowSolutions, Clues clues)
   {
-    //TODO
-    throw new UnsupportedOperationException();
+    ImmutableTable.Builder<Integer, Integer, SquareState> states = ImmutableTable.builder();
+    for(Map.Entry<Integer, PossibleSolutions> row: rowSolutions.entrySet())
+    {
+      for(Map.Entry<Integer, SquareState> rowValue: row.getValue().getFixedSquares().entrySet())
+      {
+        states.put(row.getKey(), rowValue.getKey(), rowValue.getValue());
+      }
+    }
+    return new PuzzleImpl(clues, states.build());
   }
 }

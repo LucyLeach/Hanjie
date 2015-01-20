@@ -17,7 +17,6 @@ import java.util.Map;
 public class HanjieSolver
 {
   private final InitialSolutionsCreator initialSolutionsCreator = new InitialSolutionsCreator();
-  private final PossibilityCollapser possibilityCollapser = new PossibilityCollapser();
   private final FixedSquareMerger fixedSquareMerger = new FixedSquareMerger();
 
   public Puzzle solve(Clues clues) throws UnsolvableException
@@ -29,11 +28,9 @@ public class HanjieSolver
     boolean completelySolved = false;
     while(somethingHasChanged && !completelySolved)
     {
-      boolean changedRows = collapseSolutions(rowSolutions);
-      boolean changedColumns = collapseSolutions(columnSolutions);
       boolean changedInFirstMerge = mergeRowsAndColumns(rowSolutions, columnSolutions);
       boolean changedInSecondMerge = mergeRowsAndColumns(columnSolutions, rowSolutions);
-      somethingHasChanged = changedColumns || changedRows || changedInFirstMerge || changedInSecondMerge;
+      somethingHasChanged = changedInFirstMerge || changedInSecondMerge;
       completelySolved = checkIfSolved(rowSolutions);
     }
 
@@ -54,20 +51,6 @@ public class HanjieSolver
         return initialSolutionsCreator.create(clues, length);
       }
     });
-  }
-
-  //Find which squares are fixed from all the remaining possibilities
-  private boolean collapseSolutions(Map<Integer, PossibleSolutions> possibleSolutions)
-      throws UnsolvableException
-  {
-    boolean hasEntryChanged = false;
-    for(Integer key: possibleSolutions.keySet())
-    {
-      OperationResult collapsedResult = possibilityCollapser.collapse(possibleSolutions.get(key));
-      possibleSolutions.put(key, collapsedResult.getSolutions());
-      hasEntryChanged |= collapsedResult.hasChanged();
-    }
-    return hasEntryChanged;
   }
 
   //Cross reference fixed squares between rows & columns, eliminate contradictory possibilities

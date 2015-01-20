@@ -8,6 +8,7 @@ import uk.co.lucyleach.hanjie_solver.Puzzle;
 import uk.co.lucyleach.hanjie_solver.PuzzleImpl;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,14 +46,14 @@ public class HanjieSolver
 
   private Map<Integer, PossibleSolutions> createInitialSolutions(Map<Integer, List<Integer>> clues, final int length)
   {
-    return Maps.transformValues(clues, new Function<List<Integer>, PossibleSolutions>()
-    {
-      @Override
-      public PossibleSolutions apply(List<Integer> clues)
-      {
-        return initialSolutionsCreator.create(clues, length);
-      }
-    });
+    return new HashMap<>(Maps.transformValues(clues, new Function<List<Integer>, PossibleSolutions>()
+        {
+          @Override
+          public PossibleSolutions apply(List<Integer> clues)
+          {
+            return initialSolutionsCreator.create(clues, length);
+          }
+        }));
   }
 
   //Cross reference fixed squares between rows & columns, eliminate contradictory possibilities

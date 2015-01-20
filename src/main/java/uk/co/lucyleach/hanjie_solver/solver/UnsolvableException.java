@@ -39,4 +39,9 @@ public class UnsolvableException extends Exception
   {
     return column;
   }
+
+  public Puzzle getPuzzle()
+  {
+    return puzzle;
+  }
 }

@@ -49,10 +49,9 @@ public class CluesImpl implements Clues
   private static Map<Integer, List<Integer>> makeImmutable(Map<Integer, List<Integer>> inputMap)
   {
     ImmutableMap.Builder<Integer, List<Integer>> bob = ImmutableMap.builder();
-    for(Map.Entry<Integer, List<Integer>> entry: inputMap.entrySet())
-    {
-      bob.put(entry.getKey(), ImmutableList.<Integer>builder().addAll(entry.getValue()).build());
-    }
+    inputMap.entrySet().stream().forEach(
+        (entry) -> bob.put(entry.getKey(), ImmutableList.copyOf(entry.getValue()))
+    );
     return bob.build();
   }
 }

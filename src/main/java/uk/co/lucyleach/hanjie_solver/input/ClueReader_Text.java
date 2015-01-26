@@ -7,10 +7,12 @@ import uk.co.lucyleach.hanjie_solver.CluesImpl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * User: Lucy
@@ -42,18 +44,16 @@ public class ClueReader_Text implements ClueReader<Path>
 
   private Map<Integer, List<Integer>> createClueMap(String lineFromFile)
   {
-    //TODO see if you can Java 8-ify this method.  Who needs for loops any more?
-    Iterable<String> clues = Splitter.on(CLUE_SEPARATOR).split(lineFromFile);
+    List<List<Integer>> clues = stream(Splitter.on(CLUE_SEPARATOR).split(lineFromFile).spliterator(), false)
+        .map(clue -> Splitter.on(NUMBER_SEPARATOR).splitToList(clue).stream()
+                                                                    .mapToInt(Integer::parseInt)
+                                                                    .boxed()
+                                                                    .collect(Collectors.toList()))
+        .collect(Collectors.toList());
     Map<Integer, List<Integer>> clueMap = new HashMap<>();
     int keyCounter = 1;
-    for(String clue: clues)
+    for(List<Integer> clueList: clues)
     {
-      Iterable<String> potentialNumbers = Splitter.on(NUMBER_SEPARATOR).split(clue);
-      List<Integer> clueList = new ArrayList<>();
-      for(String potentialNumber: potentialNumbers)
-      {
-        clueList.add(Integer.valueOf(potentialNumber));
-      }
       clueMap.put(keyCounter, clueList);
       keyCounter++;
     }

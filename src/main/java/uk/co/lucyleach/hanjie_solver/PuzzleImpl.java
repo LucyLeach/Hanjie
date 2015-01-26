@@ -1,6 +1,5 @@
 package uk.co.lucyleach.hanjie_solver;
 
-import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
 /**
@@ -17,21 +16,6 @@ public class PuzzleImpl implements Puzzle
   {
     this.clues = clues;
     this.states = states;
-  }
-
-  public PuzzleImpl(Clues clues)
-  {
-    this.clues = clues;
-
-    ImmutableTable.Builder<Integer, Integer, SquareState> bob = ImmutableTable.builder();
-    for(int rowIndex: clues.getRowClues().keySet())
-    {
-      for(int columnIndex: clues.getColumnClues().keySet())
-      {
-        bob.put(rowIndex, columnIndex, SquareState.UNKNOWN);
-      }
-    }
-    this.states = bob.build();
   }
 
   @Override

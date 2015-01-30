@@ -34,7 +34,7 @@ public class HanjieSolver
       boolean changedInFirstMerge = mergeRowsAndColumns(rowSolutions, columnSolutions);
       boolean changedInSecondMerge = mergeRowsAndColumns(columnSolutions, rowSolutions);
       somethingHasChanged = changedInFirstMerge || changedInSecondMerge;
-      completelySolved = checkIfSolved(rowSolutions);
+      completelySolved = rowSolutions.values().stream().allMatch(PossibleSolutions::allSquaresFixed);
     }
 
     Puzzle puzzle = solutionFromPossibilities(rowSolutions, clues);
@@ -78,28 +78,15 @@ public class HanjieSolver
     return hasAnythingChanged;
   }
 
-  //All squares fixed
-  private static boolean checkIfSolved(Map<Integer, PossibleSolutions> rowSolutions)
-  {
-    boolean allSolved = true;
-    for(PossibleSolutions solutions: rowSolutions.values())
-    {
-      allSolved &= solutions.allSquaresFixed();
-    }
-    return allSolved;
-  }
-
   //Don't need column solutions, duplicate information. NB may not have a fully solved set of solutions.
   private static Puzzle solutionFromPossibilities(Map<Integer, PossibleSolutions> rowSolutions, Clues clues)
   {
     ImmutableTable.Builder<Integer, Integer, SquareState> states = ImmutableTable.builder();
-    for(Map.Entry<Integer, PossibleSolutions> row: rowSolutions.entrySet())
-    {
-      for(Map.Entry<Integer, SquareState> rowValue: row.getValue().getFixedSquares().entrySet())
-      {
-        states.put(row.getKey(), rowValue.getKey(), rowValue.getValue());
-      }
-    }
+    rowSolutions.entrySet().stream().forEach(row ->
+        row.getValue().getFixedSquares().entrySet().stream().forEach(rowValue ->
+            states.put(row.getKey(), rowValue.getKey(), rowValue.getValue())
+        )
+    );
     return new PuzzleImpl(clues, states.build());
   }
 }

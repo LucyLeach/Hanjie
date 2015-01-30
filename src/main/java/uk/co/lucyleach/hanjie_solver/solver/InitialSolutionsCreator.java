@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.RecursiveAction;
 
 import static com.google.common.collect.Maps.toMap;
+import static java.util.stream.IntStream.rangeClosed;
 
 /**
  * Creates the set of initial solutions from the clues given
@@ -25,32 +26,10 @@ class InitialSolutionsCreator
     return new PossibleSolutionsImpl(action.getSolutions());
   }
 
-  private static int sum(Iterable<Integer> integers)
-  {
-    int runningTotal = 0;
-    for(int number: integers)
-    {
-      runningTotal += number;
-    }
-    return runningTotal;
-  }
-
   private static void addNumOfStatesToMap(int numStates, SquareState state, Map<Integer, SquareState> map)
   {
     int initialSize = map.size();
-    for(int i = 1; i <= numStates; i++)
-    {
-      map.put(i + initialSize, state);
-    }
-  }
-
-  //One-based set of concurrent integers
-  private static Set<Integer> keysOfLength(int length)
-  {
-    ImmutableSet.Builder<Integer> bob = ImmutableSet.builder();
-    for(int i = 1; i <= length; i++)
-      bob.add(i);
-    return bob.build();
+    rangeClosed(1, numStates).forEach(number -> map.put(number + initialSize, state));
   }
 
   private static class PuzzleSolvingAction extends RecursiveAction
@@ -75,11 +54,11 @@ class InitialSolutionsCreator
         int clue = Iterables.getOnlyElement(clues);
         if (clue == 0)
         {
-          solutions = ImmutableSet.of(toMap(keysOfLength(length), integer -> SquareState.BLANK));
+          solutions = ImmutableSet.of(toMap(rangeClosed(1, length).iterator(), integer -> SquareState.BLANK));
         }
         else if (clue == length)
         {
-          solutions = ImmutableSet.of(toMap(keysOfLength(length), integer -> SquareState.FULL));
+          solutions = ImmutableSet.of(toMap(rangeClosed(1, length).iterator(), integer -> SquareState.FULL));
         }
         else
         {
@@ -98,7 +77,7 @@ class InitialSolutionsCreator
       }
       else
       {
-        int totalClueLength = sum(clues);
+        int totalClueLength = clues.stream().mapToInt(Integer::valueOf).sum();
         int totalNumberOfBlanks = length - totalClueLength;
         int numberOfClues = clues.size();
         int numberOfConstrainedBlanks = numberOfClues - 1;

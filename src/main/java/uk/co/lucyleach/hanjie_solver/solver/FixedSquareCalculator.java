@@ -1,12 +1,14 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.collect.Maps.filterValues;
+import static com.google.common.collect.Maps.transformValues;
 
 /**
  * User: Lucy
@@ -15,25 +17,13 @@ import java.util.Set;
  */
 public class FixedSquareCalculator
 {
-  //Goes through all solutions looking for squares which can only have one value
   public Map<Integer, SquareState> calculate(Set<Map<Integer, SquareState>> allSolutions)
   {
-    Map<Integer, Set<SquareState>> possibleStatesForEachSquare = new HashMap<>();
-    for(Map<Integer, SquareState> solution: allSolutions)
-    {
-      for(Map.Entry<Integer, SquareState> entry: solution.entrySet())
-      {
-        if(!possibleStatesForEachSquare.containsKey(entry.getKey()))
-          possibleStatesForEachSquare.put(entry.getKey(), new HashSet<>());
+    Multimap<Integer, SquareState> allSolutionsForSquare = HashMultimap.create();
+    allSolutions.forEach(solution -> solution.entrySet().forEach(entry -> allSolutionsForSquare.put(entry.getKey(), entry.getValue())));
 
-        possibleStatesForEachSquare.get(entry.getKey()).add(entry.getValue());
-      }
-    }
-
-    ImmutableMap.Builder<Integer, SquareState> bob = ImmutableMap.builder();
-    possibleStatesForEachSquare.entrySet().stream()
-        .filter(possibleSquareStates -> possibleSquareStates.getValue().size() == 1)
-        .forEach(possibleSquareStates -> bob.put(possibleSquareStates.getKey(), possibleSquareStates.getValue().iterator().next()));
-    return bob.build();
+    return transformValues(
+        filterValues(allSolutionsForSquare.asMap(), coll -> coll.size() == 1),
+        coll -> coll.iterator().next());
   }
 }

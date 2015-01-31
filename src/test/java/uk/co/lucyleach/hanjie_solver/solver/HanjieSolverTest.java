@@ -2,7 +2,6 @@ package uk.co.lucyleach.hanjie_solver.solver;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.junit.Test;
 import uk.co.lucyleach.hanjie_solver.Clues;
@@ -13,45 +12,46 @@ import uk.co.lucyleach.hanjie_solver.SquareState;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.junit.Assert.*;
 
 //Not strictly a unit test since I'm not mocking out any of the things it's composed of.  But tbh, more useful this way.
 public class HanjieSolverTest
 {
+  private static final HanjieSolver UNDER_TEST = new HanjieSolver();
+
   @Test
   public void testSolvablePuzzle() throws UnsolvableException
   {
     Map<Integer, List<Integer>> rowClues = ImmutableMap.<Integer, List<Integer>>builder()
-        .put(1, Lists.newArrayList(2, 2))
-        .put(2, Lists.newArrayList(1, 1))
-        .put(3, Lists.newArrayList(2, 2))
-        .put(4, Lists.newArrayList(1, 1))
-        .put(5, Lists.newArrayList(1, 1, 1))
-        .put(6, Lists.newArrayList(1, 2, 1))
-        .put(7, Lists.newArrayList(2, 2))
-        .put(8, Lists.newArrayList(2, 1, 1, 1, 1))
-        .put(9, Lists.newArrayList(2, 1, 1, 2))
-        .put(10, Lists.newArrayList(3, 3))
+        .put(1, newArrayList(2, 2))
+        .put(2, newArrayList(1, 1))
+        .put(3, newArrayList(2, 2))
+        .put(4, newArrayList(1, 1))
+        .put(5, newArrayList(1, 1, 1))
+        .put(6, newArrayList(1, 2, 1))
+        .put(7, newArrayList(2, 2))
+        .put(8, newArrayList(2, 1, 1, 1, 1))
+        .put(9, newArrayList(2, 1, 1, 2))
+        .put(10, newArrayList(3, 3))
         .build();
 
     Map<Integer, List<Integer>> columnClues = ImmutableMap.<Integer, List<Integer>>builder()
-        .put(1, Lists.newArrayList(2,6))
-        .put(2, Lists.newArrayList(1,4))
-        .put(3, Lists.newArrayList(1,1))
-        .put(4, Lists.newArrayList(2,1))
-        .put(5, Lists.newArrayList(1,1))
-        .put(6, Lists.newArrayList(2,1))
-        .put(7, Lists.newArrayList(1,1))
-        .put(8, Lists.newArrayList(2,1,1))
-        .put(9, Lists.newArrayList(1,1,2))
-        .put(10, Lists.newArrayList(2,6))
+        .put(1, newArrayList(2, 6))
+        .put(2, newArrayList(1, 4))
+        .put(3, newArrayList(1, 1))
+        .put(4, newArrayList(2, 1))
+        .put(5, newArrayList(1, 1))
+        .put(6, newArrayList(2, 1))
+        .put(7, newArrayList(1, 1))
+        .put(8, newArrayList(2, 1, 1))
+        .put(9, newArrayList(1, 1, 2))
+        .put(10, newArrayList(2, 6))
         .build();
 
     Clues clues = new CluesImpl(rowClues, columnClues);
 
-    HanjieSolver underTest = new HanjieSolver();
-    Puzzle puzzle = underTest.solve(clues);
+    Puzzle puzzle = UNDER_TEST.solve(clues);
 
     assertNotNull(puzzle);
 
@@ -164,5 +164,34 @@ public class HanjieSolverTest
         .put(10, 9, SquareState.FULL)
         .put(10, 10, SquareState.FULL)
         .build();
+  }
+
+  @Test
+  public void testCluesThatCantBeSolved()
+  {
+    Map<Integer, List<Integer>> rowClues = ImmutableMap.<Integer, List<Integer>>builder()
+        .put(1, newArrayList(3))
+        .put(2, newArrayList(2))
+        .put(3, newArrayList(2)) //this clue...
+        .build();
+
+    Map<Integer, List<Integer>> columnClues = ImmutableMap.<Integer, List<Integer>>builder()
+        .put(1, newArrayList(1, 1))
+        .put(2, newArrayList(2)) //...clashes with this clue
+        .put(3, newArrayList(1))
+        .build();
+
+    Clues clues = new CluesImpl(rowClues, columnClues);
+    try
+    {
+      UNDER_TEST.solve(clues);
+      fail("Should have thrown exception");
+    } catch (UnsolvableException e)
+    {
+      assertTrue(e.getRow().isPresent());
+      assertEquals(3, e.getRow().get().intValue());
+      assertTrue(e.getColumn().isPresent());
+      assertEquals(2, e.getColumn().get().intValue());
+    }
   }
 }

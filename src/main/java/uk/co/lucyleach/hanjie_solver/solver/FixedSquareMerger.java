@@ -26,7 +26,7 @@ class FixedSquareMerger
       if(squareState.equals(toMergeInto.getFixedSquares().get(squarePosition)))
         result = new OperationResult(false, toMergeInto);
       else
-        throw new UnsolvableException("Houston we have a problem", null); //TODO
+        throw new UnsolvableException();
     }
     else
     {

@@ -7,6 +7,7 @@ import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * User: Lucy
@@ -23,22 +24,29 @@ public class PuzzleSolver
 
     Clues clues = new ClueReader_Text().readInput(Paths.get(inputFilePath));
 
-    Puzzle puzzle;
+    Optional<Puzzle> puzzle;
     try
     {
-      puzzle = solver.solve(clues);
+      puzzle = Optional.of(solver.solve(clues));
     } catch (UnsolvableException e)
     {
       System.out.println(e.getMessage());
       puzzle = e.getPuzzle();
     }
 
-    try
+    if (puzzle.isPresent())
     {
-      new PuzzleWriter_Spreadsheet().writePuzzle(puzzle, Paths.get(outputFilePath));
-    } catch (IOException e)
+      try
+      {
+        new PuzzleWriter_Spreadsheet().writePuzzle(puzzle.get(), Paths.get(outputFilePath));
+      } catch (IOException e)
+      {
+        System.out.println(e.getMessage());
+      }
+    }
+    else
     {
-      System.out.println(e.getMessage());
+      System.out.println("No puzzle was produced");
     }
   }
 }

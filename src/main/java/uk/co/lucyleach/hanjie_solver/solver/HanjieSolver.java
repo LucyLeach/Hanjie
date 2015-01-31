@@ -31,8 +31,8 @@ public class HanjieSolver
     boolean completelySolved = false;
     while(somethingHasChanged && !completelySolved)
     {
-      boolean changedInFirstMerge = mergeRowsAndColumns(rowSolutions, columnSolutions);
-      boolean changedInSecondMerge = mergeRowsAndColumns(columnSolutions, rowSolutions);
+      boolean changedInFirstMerge = mergeRowsAndColumns(rowSolutions, columnSolutions, clues);
+      boolean changedInSecondMerge = mergeRowsAndColumns(columnSolutions, rowSolutions, clues);
       somethingHasChanged = changedInFirstMerge || changedInSecondMerge;
       completelySolved = rowSolutions.values().stream().allMatch(PossibleSolutions::allSquaresFixed);
     }
@@ -57,7 +57,7 @@ public class HanjieSolver
   }
 
   //Cross reference fixed squares between rows & columns, eliminate contradictory possibilities
-  private boolean mergeRowsAndColumns(Map<Integer, PossibleSolutions> rowSolutions, Map<Integer, PossibleSolutions> columnSolutions) throws UnsolvableException
+  private boolean mergeRowsAndColumns(Map<Integer, PossibleSolutions> rowSolutions, Map<Integer, PossibleSolutions> columnSolutions, Clues clues) throws UnsolvableException
   {
     boolean hasAnythingChanged = false;
     for(Map.Entry<Integer, PossibleSolutions> rowEntry: rowSolutions.entrySet())
@@ -69,7 +69,14 @@ public class HanjieSolver
         int fixedSquareColumnNumber = rowFixedSquare.getKey();
         SquareState fixedState = rowFixedSquare.getValue();
         PossibleSolutions possColSolutions = columnSolutions.get(fixedSquareColumnNumber);
-        OperationResult mergeResult = fixedSquareMerger.merge(rowNum, fixedState, possColSolutions);
+        OperationResult mergeResult;
+        try
+        {
+          mergeResult = fixedSquareMerger.merge(rowNum, fixedState, possColSolutions);
+        } catch (UnsolvableException e)
+        {
+          throw new UnsolvableException("Error merging a fixed square in", rowNum, fixedSquareColumnNumber, solutionFromPossibilities(rowSolutions, clues));
+        }
         columnSolutions.put(fixedSquareColumnNumber, mergeResult.getSolutions());
         hasAnythingChanged |= mergeResult.hasChanged();
       }

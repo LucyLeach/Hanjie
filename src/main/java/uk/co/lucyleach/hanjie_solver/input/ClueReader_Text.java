@@ -24,6 +24,8 @@ public class ClueReader_Text implements ClueReader<Path>
   private static final String CLUE_SEPARATOR = ";";
   private static final String NUMBER_SEPARATOR = ",";
 
+  private final ClueConsistencyChecker consistencyChecker = new ClueConsistencyChecker();
+
   @Override
   public Clues readInput(Path input)
   {
@@ -35,7 +37,11 @@ public class ClueReader_Text implements ClueReader<Path>
 
       Map<Integer, List<Integer>> columnClues = createClueMap(lines.get(0));
       Map<Integer, List<Integer>> rowClues = createClueMap(lines.get(1));
-      return new CluesImpl(rowClues, columnClues);
+      CluesImpl clues = new CluesImpl(rowClues, columnClues);
+      ConsistencyCheckResult checkResult = consistencyChecker.check(clues);
+      if(checkResult.anyErrors())
+        throw new IllegalArgumentException(checkResult.toString());
+      return clues;
     } catch (IOException e)
     {
       throw new IllegalArgumentException("Error reading file: " + e.getMessage(), e);

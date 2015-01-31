@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,10 +20,12 @@ class PossibleSolutionsImpl implements PossibleSolutions
   private final Set<Map<Integer, SquareState>> allSolutions;
   private final Map<Integer, SquareState> fixedSquares;
 
+  private static final FixedSquareCalculator FIXED_SQUARE_CALCULATOR = new FixedSquareCalculator();
+
   PossibleSolutionsImpl(Set<Map<Integer, SquareState>> allSolutions)
   {
     this.allSolutions = makeImmutable(allSolutions);
-    this.fixedSquares = calculateFixedSquares(allSolutions);
+    this.fixedSquares = FIXED_SQUARE_CALCULATOR.calculate(allSolutions);
   }
 
   @Override
@@ -62,29 +62,5 @@ class PossibleSolutionsImpl implements PossibleSolutions
         return ImmutableMap.copyOf(mutableMap);
       }
     }));
-  }
-
-  //TODO test, possibly abstract out
-  private static Map<Integer, SquareState> calculateFixedSquares(Set<Map<Integer, SquareState>> allSolutions)
-  {
-    Map<Integer, Set<SquareState>> possibleStatesForEachSquare = new HashMap<>();
-    for(Map<Integer, SquareState> solution: allSolutions)
-    {
-      for(Map.Entry<Integer, SquareState> entry: solution.entrySet())
-      {
-        if(!possibleStatesForEachSquare.containsKey(entry.getKey()))
-          possibleStatesForEachSquare.put(entry.getKey(), new HashSet<>());
-
-        possibleStatesForEachSquare.get(entry.getKey()).add(entry.getValue());
-      }
-    }
-
-    ImmutableMap.Builder<Integer, SquareState> bob = ImmutableMap.builder();
-    for(Map.Entry<Integer, Set<SquareState>> possibleSquareStates: possibleStatesForEachSquare.entrySet())
-    {
-      if(possibleSquareStates.getValue().size() == 1)
-        bob.put(possibleSquareStates.getKey(), possibleSquareStates.getValue().iterator().next());
-    }
-    return bob.build();
   }
 }

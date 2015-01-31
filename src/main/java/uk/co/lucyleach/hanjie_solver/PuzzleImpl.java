@@ -1,5 +1,6 @@
 package uk.co.lucyleach.hanjie_solver;
 
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 
 /**
@@ -15,7 +16,7 @@ public class PuzzleImpl implements Puzzle
   public PuzzleImpl(Clues clues, Table<Integer, Integer, SquareState> states)
   {
     this.clues = clues;
-    this.states = states;
+    this.states = ImmutableTable.copyOf(states);
   }
 
   @Override
@@ -27,7 +28,6 @@ public class PuzzleImpl implements Puzzle
   @Override
   public Table<Integer, Integer, SquareState> getStates()
   {
-    //TODO check if Table is mutable
     return states;
   }
 }

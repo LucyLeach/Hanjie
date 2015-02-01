@@ -7,6 +7,7 @@ import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.*;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.*;
 
@@ -307,7 +308,7 @@ public class InitialSolutionsCreatorTest
 
     Set<Map<Integer, SquareState>> solutionMapSet = solutions.getAllSolutions();
     assertEquals("Should have one solution in map set", 1, solutionMapSet.size());
-    Map<Integer, SquareState> onlySolution = solutionMapSet.iterator().next();
+    Map<Integer, SquareState> onlySolution = getOnlyElement(solutionMapSet);
     assertEquals("Solution should have length input into function", length, onlySolution.size());
     testMapHasCorrectKeys(onlySolution);
 

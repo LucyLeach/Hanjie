@@ -1,6 +1,7 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
@@ -24,6 +25,7 @@ public class FixedSquareCalculator
 
     return transformValues(
         filterValues(allSolutionsForSquare.asMap(), coll -> coll.size() == 1),
-        coll -> coll.iterator().next());
+        Iterables::getOnlyElement
+    );
   }
 }

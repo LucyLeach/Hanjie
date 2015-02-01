@@ -1,12 +1,12 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.*;
 import java.util.concurrent.RecursiveAction;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Maps.toMap;
 import static java.util.stream.IntStream.rangeClosed;
 
@@ -51,7 +51,7 @@ class InitialSolutionsCreator
       Set<Map<Integer, SquareState>> solutions;
       if (clues.size() == 1)
       {
-        int clue = Iterables.getOnlyElement(clues);
+        int clue = getOnlyElement(clues);
         if (clue == 0)
         {
           solutions = ImmutableSet.of(toMap(rangeClosed(1, length).iterator(), integer -> SquareState.BLANK));

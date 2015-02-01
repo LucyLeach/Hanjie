@@ -1,6 +1,6 @@
 <aspectj>
     <aspects>
-        <aspect name="uk.co.lucyleach.hanjie_solver.performance.BasicAspect"/>
+        <aspect name="uk.co.lucyleach.hanjie_solver.performance.PerformanceAspect"/>
     </aspects>
     <!-- poi makes it very noisy otherwise -->
     <weaver options="-warn:none -Xlint:ignore"/>

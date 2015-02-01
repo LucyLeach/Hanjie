@@ -13,7 +13,7 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class PerformanceAspect
 {
-  @Around("hanjieSolver()")
+  @Around("allTopLevelMethods()")
   public Object timeProfile(ProceedingJoinPoint thisJoinPoint)
       throws Throwable
   {
@@ -21,11 +21,33 @@ public class PerformanceAspect
     Object returnedObject = thisJoinPoint.proceed();
     long endTime = System.currentTimeMillis();
     double timeTaken = (endTime - startTime) / 1000.;
-    System.out.println("Time taken: " + timeTaken + "secs");
+    System.out.println("Time taken on " + getMethodName(thisJoinPoint) + ": " + timeTaken + "secs");
     return returnedObject;
   }
 
-  @Pointcut("call(uk.co.lucyleach.hanjie_solver.Puzzle uk.co.lucyleach.hanjie_solver.solver.HanjieSolver.solve(uk.co.lucyleach.hanjie_solver.Clues))")
+  private static String getMethodName(ProceedingJoinPoint thisJoinPoint)
+  {
+    return thisJoinPoint.getThis().getClass().getSimpleName() + "." + thisJoinPoint.getSignature().getName();
+  }
+
+  @Pointcut("allHanjieSolver() || reader() || writer()")
+  private void allTopLevelMethods()
+  {}
+
+  @Pointcut("execution(* *..*HanjieSolver.solve(..))")
   private void hanjieSolver()
+  {}
+
+  @Pointcut("execution(* *..*HanjieSolver.solve(..)) || execution(* *..*HanjieSolver.createInitialSolutions(..)) " +
+      "|| execution(* *..*HanjieSolver.mergeRowsAndColumns(..))")
+  private void allHanjieSolver()
+  {}
+
+  @Pointcut("execution(* *..*ClueReader_*.readInputWithoutCheck(..))")
+  private void reader()
+  {}
+
+  @Pointcut("execution(* *..*PuzzleWriter_Spreadsheet.writePuzzle(..))")
+  private void writer()
   {}
 }

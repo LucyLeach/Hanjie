@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.concurrent.RecursiveAction;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.google.common.collect.Maps.toMap;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.rangeClosed;
 
 /**
@@ -26,10 +26,17 @@ class InitialSolutionsCreator
     return new PossibleSolutionsImpl(action.getSolutions());
   }
 
-  private static void addNumOfStatesToMap(int numStates, SquareState state, Map<Integer, SquareState> map)
+  //NB - returns and mutates the map!!
+  private static Map<Integer, SquareState> addNumOfStatesToMap(int numStates, SquareState state, Map<Integer, SquareState> map)
   {
     int initialSize = map.size();
     rangeClosed(1, numStates).forEach(number -> map.put(number + initialSize, state));
+    return map;
+  }
+
+  private static <T> Set<T> setOfOne(T element)
+  {
+    return ImmutableSet.of(element);
   }
 
   private static class PuzzleSolvingAction extends RecursiveAction
@@ -51,78 +58,93 @@ class InitialSolutionsCreator
       Set<Map<Integer, SquareState>> solutions;
       if (clues.size() == 1)
       {
-        int clue = getOnlyElement(clues);
-        if (clue == 0)
+        int onlyClue = getOnlyElement(clues);
+        if (onlyClue == 0)
         {
-          solutions = ImmutableSet.of(toMap(rangeClosed(1, length).iterator(), integer -> SquareState.BLANK));
+          solutions = setOfOne(addNumOfStatesToMap(length, SquareState.BLANK, new HashMap<>()));
         }
-        else if (clue == length)
+        else if (onlyClue == length)
         {
-          solutions = ImmutableSet.of(toMap(rangeClosed(1, length).iterator(), integer -> SquareState.FULL));
+          solutions = setOfOne(addNumOfStatesToMap(length, SquareState.FULL, new HashMap<>()));
         }
         else
         {
-          ImmutableSet.Builder<Map<Integer, SquareState>> bob = ImmutableSet.builder();
-          int numberOfBlanks = length - clue;
-          for(int blanksBefore = 0; blanksBefore <= numberOfBlanks; blanksBefore++)
-          {
-            Map<Integer, SquareState> map = new HashMap<>();
-            addNumOfStatesToMap(blanksBefore, SquareState.BLANK, map);
-            addNumOfStatesToMap(clue, SquareState.FULL, map);
-            addNumOfStatesToMap(numberOfBlanks - blanksBefore, SquareState.BLANK, map);
-            bob.add(map);
-          }
-          solutions = bob.build();
+          int totalNumberOfBlanks = length - onlyClue;
+          solutions = rangeClosed(0, totalNumberOfBlanks).boxed().map(blanksBefore ->
+            mapWithNBlanksBeforeBlock(onlyClue, totalNumberOfBlanks, blanksBefore)
+          ).collect(toSet());
         }
       }
       else
       {
         int totalClueLength = clues.stream().mapToInt(Integer::valueOf).sum();
         int totalNumberOfBlanks = length - totalClueLength;
-        int numberOfClues = clues.size();
-        int numberOfConstrainedBlanks = numberOfClues - 1;
+        int numberOfConstrainedBlanks = clues.size() - 1;
 
-        if(totalNumberOfBlanks == numberOfConstrainedBlanks) //Only have one possible solution, one blank between each block
+        if(totalNumberOfBlanks == numberOfConstrainedBlanks)
         {
-          TreeMap<Integer, SquareState> onlySolution = new TreeMap<>();
-          for(int clue: clues)
-          {
-            addNumOfStatesToMap(clue, SquareState.FULL, onlySolution);
-            addNumOfStatesToMap(1, SquareState.BLANK, onlySolution);
-          }
-          onlySolution.remove(onlySolution.lastKey()); //last blank not needed
-          solutions = ImmutableSet.of(onlySolution);
+          solutions = singleBlankBetweenEachClue(clues);
         }
         else
         {
-          int numberOfUnconstrainedBlanks = totalNumberOfBlanks - numberOfConstrainedBlanks;
           List<Integer> cluesWithoutLastEntry = new ArrayList<>(clues);
           int removedClue = cluesWithoutLastEntry.remove(cluesWithoutLastEntry.size() - 1);
-          Set<PuzzleSolvingAction> actions = new HashSet<>();
-          for(int numberOfBlanksAtEnd = 0; numberOfBlanksAtEnd <= numberOfUnconstrainedBlanks; numberOfBlanksAtEnd++)
-          {
-            //Create new puzzle to solve without the blanks at the end, the last block (defined by the last clue) and the blank just before it
-            actions.add(new PuzzleSolvingAction(length - numberOfBlanksAtEnd - 1 - removedClue, cluesWithoutLastEntry));
-          }
-          invokeAll(actions);
 
-          solutions = new HashSet<>();
-          for(PuzzleSolvingAction action: actions)
-          {
-            int numberOfBlanksAtEnd = length - action.length - 1 - removedClue;
-            for(Map<Integer, SquareState> solution: action.getSolutions())
-            {
-              Map<Integer, SquareState> clonedMap = new HashMap<>(solution);
-              addNumOfStatesToMap(1, SquareState.BLANK, clonedMap);
-              addNumOfStatesToMap(removedClue, SquareState.FULL, clonedMap);
-              addNumOfStatesToMap(numberOfBlanksAtEnd, SquareState.BLANK, clonedMap);
-              solutions.add(clonedMap);
-            }
-          }
+          Set<PuzzleSolvingAction> actions = getSubActions(totalNumberOfBlanks, numberOfConstrainedBlanks, cluesWithoutLastEntry, removedClue, length);
+          invokeAll(actions);
+          solutions = joinCompletedSubActions(removedClue, actions, length);
         }
       }
 
       this.solutions = solutions;
+    }
+
+    private static Set<Map<Integer, SquareState>> singleBlankBetweenEachClue(List<Integer> clues)
+    {
+      TreeMap<Integer, SquareState> onlySolution = new TreeMap<>();
+      for(int clue: clues)
+      {
+        addNumOfStatesToMap(clue, SquareState.FULL, onlySolution);
+        addNumOfStatesToMap(1, SquareState.BLANK, onlySolution);
+      }
+      onlySolution.remove(onlySolution.lastKey()); //last blank not needed
+      return setOfOne(onlySolution);
+    }
+
+    private static Set<PuzzleSolvingAction> getSubActions(int totalNumberOfBlanks, int numberOfConstrainedBlanks, List<Integer> cluesWithoutLastEntry, int removedClue, int length)
+    {
+      int numberOfUnconstrainedBlanks = totalNumberOfBlanks - numberOfConstrainedBlanks;
+      //Create new puzzles to solve without the blanks at the end, the last block (defined by the last clue) and the blank just before it
+      return rangeClosed(0, numberOfUnconstrainedBlanks).boxed().map(
+          numBlanksAtEnd -> new PuzzleSolvingAction(length - numBlanksAtEnd - 1 - removedClue, cluesWithoutLastEntry)
+      ).collect(toSet());
+    }
+
+    private static Set<Map<Integer, SquareState>> joinCompletedSubActions(int removedClue, Set<PuzzleSolvingAction> actions, int length)
+    {
+      Set<Map<Integer, SquareState>> solutions;
+      solutions = actions.stream().flatMap(
+          action -> action.getSolutions().stream().map(
+              solution -> {
+                int numberOfBlanksAtEnd = length - action.length - 1 - removedClue;
+                Map<Integer, SquareState> clonedMap = new HashMap<>(solution);
+                addNumOfStatesToMap(1, SquareState.BLANK, clonedMap);
+                addNumOfStatesToMap(removedClue, SquareState.FULL, clonedMap);
+                addNumOfStatesToMap(numberOfBlanksAtEnd, SquareState.BLANK, clonedMap);
+                return clonedMap;
+              }
+          )
+      ).collect(toSet());
+      return solutions;
+    }
+
+    private Map<Integer, SquareState> mapWithNBlanksBeforeBlock(int clue, int numberOfBlanks, Integer blanksBefore)
+    {
+      Map<Integer, SquareState> map = new HashMap<>();
+      addNumOfStatesToMap(blanksBefore, SquareState.BLANK, map);
+      addNumOfStatesToMap(clue, SquareState.FULL, map);
+      addNumOfStatesToMap(numberOfBlanks - blanksBefore, SquareState.BLANK, map);
+      return map;
     }
 
     public Set<Map<Integer, SquareState>> getSolutions()

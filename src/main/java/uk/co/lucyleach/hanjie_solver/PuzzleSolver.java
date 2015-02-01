@@ -1,6 +1,6 @@
 package uk.co.lucyleach.hanjie_solver;
 
-import uk.co.lucyleach.hanjie_solver.input.ClueReader_Text;
+import uk.co.lucyleach.hanjie_solver.input.ClueReader_Spreadsheet;
 import uk.co.lucyleach.hanjie_solver.output.PuzzleWriter_Spreadsheet;
 import uk.co.lucyleach.hanjie_solver.solver.HanjieSolver;
 import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
@@ -22,7 +22,7 @@ public class PuzzleSolver
     String outputFilePath = args[1];
     HanjieSolver solver = new HanjieSolver();
 
-    Clues clues = new ClueReader_Text().readInput(Paths.get(inputFilePath));
+    Clues clues = new ClueReader_Spreadsheet().readInput(Paths.get(inputFilePath));
 
     Optional<Puzzle> puzzle;
     try

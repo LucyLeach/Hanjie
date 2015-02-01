@@ -61,6 +61,8 @@ public class PuzzleWriter_Spreadsheet implements PuzzleWriter<Path>
 
   private static CellStyle getCellStyleForState(SquareState state, Workbook workbook)
   {
+    if(state == null)
+      state = SquareState.BLANK;
     CellStyle cellStyle = workbook.createCellStyle();
     switch (state)
     {

@@ -63,7 +63,7 @@ public class ClueReader_Spreadsheet implements ClueReader<Path>
   private static String getStringValue(Cell cell)
   {
     if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC)
-      return Double.valueOf(cell.getNumericCellValue()).toString();
+      return Integer.toString((int) Math.floor(cell.getNumericCellValue()));
     if(cell.getCellType() == Cell.CELL_TYPE_STRING)
       return cell.getStringCellValue();
     else

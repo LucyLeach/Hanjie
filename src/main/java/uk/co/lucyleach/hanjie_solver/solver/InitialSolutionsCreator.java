@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.*;
-import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.util.stream.Collectors.toSet;
@@ -21,9 +21,9 @@ class InitialSolutionsCreator
 {
   PossibleSolutions create(List<Integer> clues, int length)
   {
-    PuzzleSolvingAction action = new PuzzleSolvingAction(length, clues);
-    action.compute();
-    return new PossibleSolutionsImpl(action.getSolutions());
+    PuzzleSolvingTask task = new PuzzleSolvingTask(length, clues);
+    Set<Map<Integer, SquareState>> result = task.compute();
+    return new PossibleSolutionsImpl(result);
   }
 
   //NB - returns and mutates the map!!
@@ -39,21 +39,19 @@ class InitialSolutionsCreator
     return ImmutableSet.of(element);
   }
 
-  private static class PuzzleSolvingAction extends RecursiveAction
+  private static class PuzzleSolvingTask extends RecursiveTask<Set<Map<Integer, SquareState>>>
   {
     private final int length;
     private final List<Integer> clues;
 
-    private Set<Map<Integer, SquareState>> solutions;
-
-    public PuzzleSolvingAction(int length, List<Integer> clues)
+    private PuzzleSolvingTask(int length, List<Integer> clues)
     {
       this.length = length;
       this.clues = clues;
     }
 
     @Override
-    protected void compute()
+    protected Set<Map<Integer, SquareState>> compute()
     {
       Set<Map<Integer, SquareState>> solutions;
       if (clues.size() == 1)
@@ -90,13 +88,12 @@ class InitialSolutionsCreator
           List<Integer> cluesWithoutLastEntry = new ArrayList<>(clues);
           int removedClue = cluesWithoutLastEntry.remove(cluesWithoutLastEntry.size() - 1);
 
-          Set<PuzzleSolvingAction> actions = getSubActions(totalNumberOfBlanks, numberOfConstrainedBlanks, cluesWithoutLastEntry, removedClue, length);
-          invokeAll(actions);
+          Set<PuzzleSolvingTask> actions = getSubActions(totalNumberOfBlanks, numberOfConstrainedBlanks, cluesWithoutLastEntry, removedClue, length);
           solutions = joinCompletedSubActions(removedClue, actions, length);
         }
       }
 
-      this.solutions = solutions;
+      return solutions;
     }
 
     private static Set<Map<Integer, SquareState>> singleBlankBetweenEachClue(List<Integer> clues)
@@ -111,20 +108,24 @@ class InitialSolutionsCreator
       return setOfOne(onlySolution);
     }
 
-    private static Set<PuzzleSolvingAction> getSubActions(int totalNumberOfBlanks, int numberOfConstrainedBlanks, List<Integer> cluesWithoutLastEntry, int removedClue, int length)
+    private static Set<PuzzleSolvingTask> getSubActions(int totalNumberOfBlanks, int numberOfConstrainedBlanks, List<Integer> cluesWithoutLastEntry, int removedClue, int length)
     {
       int numberOfUnconstrainedBlanks = totalNumberOfBlanks - numberOfConstrainedBlanks;
       //Create new puzzles to solve without the blanks at the end, the last block (defined by the last clue) and the blank just before it
       return rangeClosed(0, numberOfUnconstrainedBlanks).boxed().map(
-          numBlanksAtEnd -> new PuzzleSolvingAction(length - numBlanksAtEnd - 1 - removedClue, cluesWithoutLastEntry)
+          numBlanksAtEnd -> {
+            PuzzleSolvingTask task = new PuzzleSolvingTask(length - numBlanksAtEnd - 1 - removedClue, cluesWithoutLastEntry);
+            task.fork();
+            return task;
+          }
       ).collect(toSet());
     }
 
-    private static Set<Map<Integer, SquareState>> joinCompletedSubActions(int removedClue, Set<PuzzleSolvingAction> actions, int length)
+    private static Set<Map<Integer, SquareState>> joinCompletedSubActions(int removedClue, Set<PuzzleSolvingTask> actions, int length)
     {
       Set<Map<Integer, SquareState>> solutions;
       solutions = actions.stream().flatMap(
-          action -> action.getSolutions().stream().map(
+          action -> action.join().stream().map(
               solution -> {
                 int numberOfBlanksAtEnd = length - action.length - 1 - removedClue;
                 Map<Integer, SquareState> clonedMap = new HashMap<>(solution);
@@ -145,11 +146,6 @@ class InitialSolutionsCreator
       addNumOfStatesToMap(clue, SquareState.FULL, map);
       addNumOfStatesToMap(numberOfBlanks - blanksBefore, SquareState.BLANK, map);
       return map;
-    }
-
-    public Set<Map<Integer, SquareState>> getSolutions()
-    {
-      return solutions;
     }
   }
 }

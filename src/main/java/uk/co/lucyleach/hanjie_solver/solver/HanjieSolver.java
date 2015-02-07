@@ -1,16 +1,17 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableTable;
-import com.google.common.collect.Maps;
 import uk.co.lucyleach.hanjie_solver.Clues;
 import uk.co.lucyleach.hanjie_solver.Puzzle;
 import uk.co.lucyleach.hanjie_solver.PuzzleImpl;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.transformValues;
 
 /**
  * User: Lucy
@@ -46,14 +47,34 @@ public class HanjieSolver
 
   private Map<Integer, PossibleSolutions> createInitialSolutions(Map<Integer, List<Integer>> clues, final int length)
   {
-    return new HashMap<>(Maps.transformValues(clues, new Function<List<Integer>, PossibleSolutions>()
-        {
-          @Override
-          public PossibleSolutions apply(List<Integer> clues)
-          {
-            return initialSolutionsCreator.create(clues, length);
-          }
-        }));
+    //Surely there's a better way than this!
+    Map<Integer, List<Pair<Integer, PossibleSolutions>>> map =  clues.entrySet().stream()
+        .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+        .map(pair -> new Pair<>(pair.getA(), initialSolutionsCreator.create(pair.getB(), length)))
+        .collect(Collectors.groupingBy(Pair::getA));
+    return newHashMap(transformValues(map, list -> list.get(0).getB()));
+  }
+
+  private static final class Pair<A,B>
+  {
+    private final A a;
+    private final B b;
+
+    public Pair(A a, B b)
+    {
+      this.a = a;
+      this.b = b;
+    }
+
+    public A getA()
+    {
+      return a;
+    }
+
+    public B getB()
+    {
+      return b;
+    }
   }
 
   //Cross reference fixed squares between rows & columns, eliminate contradictory possibilities

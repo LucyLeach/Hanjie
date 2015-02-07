@@ -8,6 +8,8 @@ import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -48,11 +50,25 @@ public class HanjieSolver
   private Map<Integer, PossibleSolutions> createInitialSolutions(Map<Integer, List<Integer>> clues, final int length)
   {
     //Surely there's a better way than this!
-    Map<Integer, List<Pair<Integer, PossibleSolutions>>> map =  clues.entrySet().parallelStream()
+    ForkJoinPool pool = new ForkJoinPool(4);
+    Map<Integer, List<Pair<Integer, PossibleSolutions>>> map = null;
+    try
+    {
+      map = pool.submit(() -> computeInitialSolutions(clues, length)).get();
+    } catch (InterruptedException | ExecutionException e)
+    {
+      e.printStackTrace();
+      throw new RuntimeException("Bad stuff happened");
+    }
+    return newHashMap(transformValues(map, list -> list.get(0).getB()));
+  }
+
+  private Map<Integer, List<Pair<Integer, PossibleSolutions>>> computeInitialSolutions(Map<Integer, List<Integer>> clues, int length)
+  {
+    return clues.entrySet().parallelStream()
         .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
         .map(pair -> new Pair<>(pair.getA(), initialSolutionsCreator.create(pair.getB(), length)))
         .collect(Collectors.groupingBy(Pair::getA));
-    return newHashMap(transformValues(map, list -> list.get(0).getB()));
   }
 
   private static final class Pair<A,B>

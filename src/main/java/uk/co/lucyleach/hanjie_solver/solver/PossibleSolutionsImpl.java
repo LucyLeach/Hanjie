@@ -24,7 +24,7 @@ class PossibleSolutionsImpl implements PossibleSolutions
 
   PossibleSolutionsImpl(Set<Map<Integer, SquareState>> allSolutions)
   {
-    this.allSolutions = makeImmutable(allSolutions);
+    this.allSolutions = allSolutions;//makeImmutable(allSolutions);
     this.fixedSquares = FIXED_SQUARE_CALCULATOR.calculate(allSolutions);
   }
 

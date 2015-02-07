@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
@@ -21,8 +22,9 @@ class InitialSolutionsCreator
 {
   PossibleSolutions create(List<Integer> clues, int length)
   {
+    ForkJoinPool singleThreadPool = new ForkJoinPool(1);
     PuzzleSolvingTask task = new PuzzleSolvingTask(length, clues);
-    Set<Map<Integer, SquareState>> result = task.compute();
+    Set<Map<Integer, SquareState>> result = singleThreadPool.invoke(task);
     return new PossibleSolutionsImpl(result);
   }
 

@@ -48,7 +48,7 @@ public class HanjieSolver
   private Map<Integer, PossibleSolutions> createInitialSolutions(Map<Integer, List<Integer>> clues, final int length)
   {
     //Surely there's a better way than this!
-    Map<Integer, List<Pair<Integer, PossibleSolutions>>> map =  clues.entrySet().stream()
+    Map<Integer, List<Pair<Integer, PossibleSolutions>>> map =  clues.entrySet().parallelStream()
         .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
         .map(pair -> new Pair<>(pair.getA(), initialSolutionsCreator.create(pair.getB(), length)))
         .collect(Collectors.groupingBy(Pair::getA));

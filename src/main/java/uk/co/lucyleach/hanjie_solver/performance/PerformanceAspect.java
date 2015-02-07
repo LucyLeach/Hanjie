@@ -3,7 +3,6 @@ package uk.co.lucyleach.hanjie_solver.performance;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,11 +29,14 @@ public class PerformanceAspect
     return returnedObject;
   }
 
-  @Before("initialSolutionsCreator()")
-  public void logCallCount()
+  @Around("initialSolutionsCreator()")
+  public Object logCallCount(ProceedingJoinPoint thisJoinPoint) throws Throwable
   {
     int nextValue = counter.incrementAndGet();
     System.out.println("Creating initial solutions, call number: " + nextValue);
+    Object returnedObject = thisJoinPoint.proceed();
+    System.out.println("Creating initial solutions, finished call number: " + nextValue);
+    return returnedObject;
   }
 
   private static String getMethodName(ProceedingJoinPoint thisJoinPoint)

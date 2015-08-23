@@ -46,6 +46,9 @@ public class ClueReader_Spreadsheet implements ClueReader<Path>
     }
     Map<Integer, List<Integer>> columnClues = createClueMap(columnCluesAsStrings.stream());
 
+    if(columnClues.isEmpty())
+      throw new IllegalArgumentException("No column clues found");
+
     int nextRowIndex = 1;
     Row nextRow = sheet.getRow(nextRowIndex);
     List<String> rowCluesAsStrings = new ArrayList<>();
@@ -56,6 +59,9 @@ public class ClueReader_Spreadsheet implements ClueReader<Path>
       nextRow = sheet.getRow(nextRowIndex);
     }
     Map<Integer, List<Integer>> rowClues = createClueMap(rowCluesAsStrings.stream());
+
+    if(rowClues.isEmpty())
+      throw new IllegalArgumentException("No row clues found");
 
     return new CluesImpl(rowClues, columnClues);
   }

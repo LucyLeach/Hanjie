@@ -2,7 +2,7 @@ package uk.co.lucyleach.hanjie_solver;
 
 import uk.co.lucyleach.hanjie_solver.input.ClueReader_Spreadsheet;
 import uk.co.lucyleach.hanjie_solver.output.PuzzleWriter_Spreadsheet;
-import uk.co.lucyleach.hanjie_solver.solver.HanjieSolver;
+import uk.co.lucyleach.hanjie_solver.solver.HanjieSolverImpl;
 import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class PuzzleSolver
   {
     String inputFilePath = args[0];
     String outputFilePath = args[1];
-    HanjieSolver solver = new HanjieSolver();
+    HanjieSolver solver = new HanjieSolverImpl();
 
     Clues clues = new ClueReader_Spreadsheet().readInput(Paths.get(inputFilePath));
 

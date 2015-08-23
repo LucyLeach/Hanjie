@@ -1,10 +1,7 @@
 package uk.co.lucyleach.hanjie_solver.solver;
 
 import com.google.common.collect.ImmutableTable;
-import uk.co.lucyleach.hanjie_solver.Clues;
-import uk.co.lucyleach.hanjie_solver.Puzzle;
-import uk.co.lucyleach.hanjie_solver.PuzzleImpl;
-import uk.co.lucyleach.hanjie_solver.SquareState;
+import uk.co.lucyleach.hanjie_solver.*;
 
 import java.util.List;
 import java.util.Map;
@@ -20,11 +17,12 @@ import static com.google.common.collect.Maps.transformValues;
  * Date: 19/01/2015
  * Time: 19:52
  */
-public class HanjieSolver
+public class HanjieSolverImpl implements HanjieSolver
 {
   private final InitialSolutionsCreator initialSolutionsCreator = new InitialSolutionsCreator();
   private final FixedSquareMerger fixedSquareMerger = new FixedSquareMerger();
 
+  @Override
   public Puzzle solve(Clues clues) throws UnsolvableException
   {
     Map<Integer, PossibleSolutions> rowSolutions = createInitialSolutions(clues.getRowClues(), clues.getRowLength());

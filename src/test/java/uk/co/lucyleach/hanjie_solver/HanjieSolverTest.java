@@ -1,13 +1,10 @@
-package uk.co.lucyleach.hanjie_solver.solver;
+package uk.co.lucyleach.hanjie_solver;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import org.junit.Test;
-import uk.co.lucyleach.hanjie_solver.Clues;
-import uk.co.lucyleach.hanjie_solver.CluesImpl;
-import uk.co.lucyleach.hanjie_solver.Puzzle;
-import uk.co.lucyleach.hanjie_solver.SquareState;
+import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
 
 import java.util.List;
 import java.util.Map;
@@ -16,9 +13,14 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.*;
 
 //Not strictly a unit test since I'm not mocking out any of the things it's composed of.  But tbh, more useful this way.
-public class HanjieSolverTest
+public abstract class HanjieSolverTest
 {
-  private static final HanjieSolver UNDER_TEST = new HanjieSolver();
+  private final HanjieSolver solverUnderTest;
+
+  public HanjieSolverTest(HanjieSolver solver)
+  {
+    this.solverUnderTest = solver;
+  }
 
   @Test
   public void testSolvablePuzzle() throws UnsolvableException
@@ -51,7 +53,7 @@ public class HanjieSolverTest
 
     Clues clues = new CluesImpl(rowClues, columnClues);
 
-    Puzzle puzzle = UNDER_TEST.solve(clues);
+    Puzzle puzzle = solverUnderTest.solve(clues);
 
     assertNotNull(puzzle);
 
@@ -184,7 +186,7 @@ public class HanjieSolverTest
     Clues clues = new CluesImpl(rowClues, columnClues);
     try
     {
-      UNDER_TEST.solve(clues);
+      solverUnderTest.solve(clues);
       fail("Should have thrown exception");
     } catch (UnsolvableException e)
     {

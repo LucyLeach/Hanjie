@@ -15,6 +15,12 @@ public class HanjieSolverImpl2 implements HanjieSolver
   @Override
   public Puzzle solve(Clues clues) throws UnsolvableException
   {
+    //Any rows/columns already known?
+    //If yes, fill them in
+    //If no, find one most likely to yield good results (large number of known squares, near the edge)
+    //Keep track of altered columns/rows, fill in what you can on those, keep track of what you've changed etc (alternate columns, rows)
+    //If get stuck, start again
+
     return null;
   }
 }

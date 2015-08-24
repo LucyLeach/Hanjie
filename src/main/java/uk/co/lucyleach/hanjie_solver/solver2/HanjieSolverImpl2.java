@@ -3,7 +3,10 @@ package uk.co.lucyleach.hanjie_solver.solver2;
 import uk.co.lucyleach.hanjie_solver.Clues;
 import uk.co.lucyleach.hanjie_solver.HanjieSolver;
 import uk.co.lucyleach.hanjie_solver.Puzzle;
+import uk.co.lucyleach.hanjie_solver.SquareState;
 import uk.co.lucyleach.hanjie_solver.solver.UnsolvableException;
+
+import java.util.Arrays;
 
 /**
  * User: Lucy
@@ -22,5 +25,15 @@ public class HanjieSolverImpl2 implements HanjieSolver
     //If get stuck, start again
 
     return null;
+  }
+
+  private SquareState[][] createUnknownInitialGrid(Clues clues) {
+    SquareState[][] grid = new SquareState[clues.getRowLength()][];
+    for(int i = 0; i < clues.getRowLength(); i++) {
+      SquareState[] row = new SquareState[clues.getColumnLength()];
+      Arrays.fill(row, SquareState.UNKNOWN);
+      grid[i] = row;
+    }
+    return grid;
   }
 }

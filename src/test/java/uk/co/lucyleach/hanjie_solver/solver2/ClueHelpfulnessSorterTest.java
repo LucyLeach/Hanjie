@@ -83,7 +83,7 @@ public class ClueHelpfulnessSorterTest
     assertTrue(Sets.newHashSet(0, 3).contains(winningScore.getNumber()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void throwErrorIfAllUnknowable() {
     Map<Integer, List<Integer>> rows = ImmutableMap.<Integer, List<Integer>>builder()
         .put(0, Lists.newArrayList(1,1))
@@ -98,6 +98,10 @@ public class ClueHelpfulnessSorterTest
         .put(3, Lists.newArrayList(1,1))
         .build();
     Clues clues = new CluesImpl(rows, columns);
-    UNDER_TEST.bestClue(clues);
+    ClueHelpfulnessScore winningScore = UNDER_TEST.bestClue(clues);
+
+    assertNotNull(winningScore);
+    //Doesn't matter which edge, just that it returns one
+    assertTrue(Sets.newHashSet(0, 3).contains(winningScore.getNumber()));
   }
 }

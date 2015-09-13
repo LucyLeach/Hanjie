@@ -13,6 +13,8 @@ import java.util.stream.Stream;
  */
 public class ClueHelpfulnessSorter
 {
+  private final KnowableSquareCalculator knowableSquareCalculator = new KnowableSquareCalculator();
+
   public ClueHelpfulnessScore bestClue(Clues clues) throws IllegalArgumentException {
     Stream<ClueHelpfulnessScore> rowClues = clues.getRowClues().entrySet().stream().map(clue -> scoreClue(clue, true, clues.getColumnLength()));
     Stream<ClueHelpfulnessScore> columnClues = clues.getColumnClues().entrySet().stream().map(clue -> scoreClue(clue, false, clues.getRowLength()));
@@ -23,29 +25,11 @@ public class ClueHelpfulnessSorter
     int number = clue.getKey();
     List<Integer> clues = clue.getValue();
 
-    int knownSquares;
-    if(!clues.isEmpty())
-    {
-      int numberOfFilledInSquares = clues.parallelStream().reduce(0, (a, b) -> a + b);
-      int numberOfGaps = clues.size() - 1;
-      int totalLengthOfClues = numberOfFilledInSquares + numberOfGaps;
-      int spareSquares = length - totalLengthOfClues;
-      if (spareSquares > 0)
-      {
-        knownSquares = clues.parallelStream().reduce(0, (totalSoFar, newClue) -> totalSoFar + Math.max(0, newClue - spareSquares));
-      }
-      else
-      {
-        knownSquares = length;
-      }
-    }
-    else
-    {
-      knownSquares = 0;
-    }
+    int knownSquares = knowableSquareCalculator.calculate(length, clues);
 
     int distanceFromEdge = Math.max(number, length - number);
 
     return new ClueHelpfulnessScore(isRow, number, knownSquares + distanceFromEdge);
   }
+
 }

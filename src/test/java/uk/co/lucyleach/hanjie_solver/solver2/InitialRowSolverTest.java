@@ -9,9 +9,14 @@ import static uk.co.lucyleach.hanjie_solver.SquareState.BLANK;
 import static uk.co.lucyleach.hanjie_solver.SquareState.FULL;
 import static uk.co.lucyleach.hanjie_solver.SquareState.UNKNOWN;
 
-public class InitialRowSolverTest
+public abstract class InitialRowSolverTest
 {
-  private final InitialRowSolver underTest = new InitialRowSolver();
+  private final InitialRowSolver underTest;
+
+  public InitialRowSolverTest(InitialRowSolver underTest)
+  {
+    this.underTest = underTest;
+  }
 
   @Test
   public void noBlocks() {

@@ -4,7 +4,6 @@ import uk.co.lucyleach.hanjie_solver.SquareState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -12,24 +11,10 @@ import java.util.stream.IntStream;
  * Date: 13/09/2015
  * Time: 17:26
  */
-public class InitialRowSolver_A implements InitialRowSolver
+public class InitialRowSolver_A extends InitialRowSolver
 {
-  public SolutionStepResult solve(List<Integer> clues, int length) {
-    int numberOfFilledInSquares = clues.parallelStream().reduce(0, (a, b) -> a + b);
-    int numberOfGaps = clues.isEmpty() ? length: clues.size() - 1;
-    int totalLengthOfClues = numberOfFilledInSquares + numberOfGaps;
-
-    if(totalLengthOfClues > length)
-      throw new IllegalArgumentException("Clues " + clues.toString() + " don't fit in length " + length);
-
-    if(clues.isEmpty())
-      return new SolutionStepResult(SquareState.arrayOf(length, SquareState.BLANK), IntStream.range(0, length).boxed().collect(Collectors.toList()));
-
-    int spareSquares = length - totalLengthOfClues;
-    return fillInKnownSquares(clues, spareSquares);
-  }
-
-  private SolutionStepResult fillInKnownSquares(List<Integer> clues, int spareSquares)
+  @Override
+  SolutionStepResult fillInKnownSquares(List<Integer> clues, int spareSquares, int length)
   {
     SolutionStepResult stepResult;
     List<SquareState> resultList = new ArrayList<>();

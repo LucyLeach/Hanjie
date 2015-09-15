@@ -35,7 +35,7 @@ public class InitialRowSolver_Ranges extends InitialRowSolver
         newlyKnownSquares.add(earliestEndExcl);
       }
 
-      blockStart = earliestEndExcl;
+      blockStart = earliestEndExcl + 1;
     }
 
     return new SolutionStepResult(result, newlyKnownSquares);

@@ -20,22 +20,22 @@ public class InitialRowSolver_Ranges extends InitialRowSolver
 
     int blockStart = 0;
     for(int block: clues) {
-      int earliestEndExcl = blockStart + block;
+      int earliestEnd = blockStart + block;
 
       if(spareSquares < block) { //Can fill in squares
         int filledInStart = blockStart + spareSquares;
-        for(int i = filledInStart; i < earliestEndExcl; i++) {
+        for(int i = filledInStart; i < earliestEnd; i++) {
           result[i] = SquareState.FULL;
           newlyKnownSquares.add(i);
         }
       }
 
-      if(spareSquares == 0 && earliestEndExcl < length) { //no spare squares and not last block
-        result[earliestEndExcl] = SquareState.BLANK;
-        newlyKnownSquares.add(earliestEndExcl);
+      if(spareSquares == 0 && earliestEnd < length) { //no spare squares and not last block
+        result[earliestEnd] = SquareState.BLANK;
+        newlyKnownSquares.add(earliestEnd);
       }
 
-      blockStart = earliestEndExcl + 1;
+      blockStart = earliestEnd + 1;
     }
 
     return new SolutionStepResult(result, newlyKnownSquares);

@@ -92,4 +92,40 @@ public abstract class RowSolverTest extends InitialRowSolverTest
     assertArrayEquals(new SquareState[]{BLANK, UNKNOWN, FULL, FULL, FULL, UNKNOWN, BLANK}, result.getStepResult());
     assertEquals(newArrayList(0, 3, 6), result.getNewlyKnownSquares());
   }
+
+  @Test
+  public void twoBlocksOneFixedAtEnd() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{FULL, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN});
+    assertArrayEquals(new SquareState[]{FULL, FULL, BLANK, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}, result.getStepResult());
+  }
+
+  @Test
+  public void twoBlocksOneFixedOnePartiallyKnowable() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{FULL, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN});
+    assertArrayEquals(new SquareState[]{FULL, FULL, BLANK, UNKNOWN, FULL, UNKNOWN}, result.getStepResult());
+  }
+
+  @Test
+  public void twoBlocksEndCantBeReached() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{FULL, UNKNOWN, UNKNOWN, UNKNOWN, FULL, UNKNOWN, UNKNOWN});
+    assertArrayEquals(new SquareState[]{FULL, FULL, BLANK, UNKNOWN, FULL, UNKNOWN, BLANK}, result.getStepResult());
+  }
+
+  @Test
+  public void twoBlocksOneSquareCouldBeEither() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{UNKNOWN, UNKNOWN, UNKNOWN, FULL, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN});
+    assertArrayEquals(new SquareState[]{UNKNOWN, UNKNOWN, UNKNOWN, FULL, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}, result.getStepResult());
+  }
+
+  @Test
+  public void twoBlocksCantBeEnds() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{UNKNOWN, UNKNOWN, FULL, UNKNOWN, UNKNOWN, FULL, UNKNOWN, UNKNOWN});
+    assertArrayEquals(new SquareState[]{BLANK, UNKNOWN, FULL, UNKNOWN, UNKNOWN, FULL, UNKNOWN, BLANK}, result.getStepResult());
+  }
+
+  @Test
+  public void twoBlocksMustHaveGap() {
+    SolutionStepResult result = underTest.solveRow(newArrayList(2, 2), new SquareState[]{UNKNOWN, FULL, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, FULL, UNKNOWN});
+    assertArrayEquals(new SquareState[]{UNKNOWN, FULL, UNKNOWN, BLANK, BLANK, BLANK, UNKNOWN, FULL, UNKNOWN}, result.getStepResult());
+  }
 }

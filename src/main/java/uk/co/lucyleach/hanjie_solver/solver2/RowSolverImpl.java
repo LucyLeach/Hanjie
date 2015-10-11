@@ -56,6 +56,15 @@ public class RowSolverImpl extends RowSolver
       }
     }
 
+    //if there are squares that must be coloured in because there's a block that's bigger than the diff... well, haven't we
+    //already covered that in the initial colouring in?  Yeah, so we can ignore that case.
+
+    //we might know that there's a sparse set of squares and we know what they all are because there's one per block.
+    //we might have squares close to the edge and we know which they are, or building out from there we might be able to tell
+    //which the next one is, and which is the next one.
+
+    //It might have a square that can't possibly be coloured in.
+
     if(possibleStarts.isEmpty()) {
       throw new IllegalArgumentException("Damn, impossible situation");
     }
